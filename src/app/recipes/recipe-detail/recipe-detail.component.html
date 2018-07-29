@@ -10,11 +10,11 @@
 </div>
 <div class="row">
   <div class="col-md-12">
-    <div class="btn-group">
-      <button class="btn btn-primary dropdown-toggle my-1" href="#" id="recipeDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <div class="btn-group" ngbDropdown >
+      <button class="btn btn-primary dropdown-toggle my-1" ngbDropdownToggle  href="#" id="recipeDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Manage Recipe
       </button>
-      <ul class="dropdown-menu" aria-labelledby="recipeDropdown">
+      <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="recipeDropdown">
         <li>
           <a class="dropdown-item" href="#">To Shopping List</a>
         </li>

@@ -14,11 +14,11 @@
         <li class="nav-item active">
           <a class="nav-link" href="#" (click)="onSelect('shopping-list')">Shopping list</a>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <li class="nav-item dropdown" ngbDropdown>
+          <a class="nav-link" href="#" ngbDropdownToggle id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Dropdown
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="#">Save Data</a>
             <a class="dropdown-item" href="#">Fetch Data</a>
           </div>
