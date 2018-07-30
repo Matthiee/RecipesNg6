@@ -1,14 +1,14 @@
 <div class="row">
   <div class="col-md-12">
-    <app-shopping-edit (ingredientAdded)="ingredientAdded($event)"></app-shopping-edit>
+    <app-shopping-edit></app-shopping-edit>
     <hr />
     <ul class="list-group">
-      <a class="list-group-item flex-column" style="cursor: pointer" *ngFor="let ingredient of ingredients">
+      <li class="list-group-item flex-column" style="cursor: pointer" *ngFor="let ingredient of ingredients">
         <div class="d-flex w-100 justify-content-between">
           {{ ingredient.name }}
           <span class="badge badge-primary badge-pill">{{ ingredient.amount }}</span>
         </div>
-      </a>
+      </li>
     </ul>
   </div>
 </div>

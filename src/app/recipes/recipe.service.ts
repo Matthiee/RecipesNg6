@@ -15,7 +15,7 @@ export class RecipeService {
     new Recipe('Spaghetti', 'Itialian spaghetti made with love blabla', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCCYz2ECNEhS2iw3VCFuoNTNRsToFwIp1fHQXECqidby2TGcKG')
   ];
 
-  getRecipes() {
+  getRecipes(): Recipe[] {
     return this.recipes.slice();
   }
 
