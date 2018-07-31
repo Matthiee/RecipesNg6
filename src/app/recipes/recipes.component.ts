@@ -18,6 +18,7 @@ export class RecipesComponent implements OnInit {
     this.recipeSvc.recipeSelected
       .subscribe((recipe: Recipe) => {
         this.selectedRecipe = recipe;
+        console.log(recipe);
       });
 
   }

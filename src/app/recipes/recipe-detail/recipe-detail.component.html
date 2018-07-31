@@ -35,6 +35,12 @@
 </div>
 <div class="row">
   <div class="col-md-12">
-    Ingredients
+    row
+    <ul class="list-group" *ngFor="let ingredient of recipe.ingredients">
+      <li class="list-group-item list-group-item-action" >
+        Name: {{ ingredient.name }}
+        <span class="badge badge-primary badge-pill">{{ ingredient.amount }}</span>
+      </li>
+    </ul>
   </div>
 </div>
