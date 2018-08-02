@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -8,17 +8,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 })
 export class HeaderComponent implements OnInit {
 
-  @Output()
-  featureSelected = new EventEmitter<string>();
-
-
   constructor() { }
 
   ngOnInit() {
-  }
-
-  onSelect(feature: string) {
-    this.featureSelected.emit(feature);
   }
 
 }
