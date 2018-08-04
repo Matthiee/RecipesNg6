@@ -32,7 +32,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   onEditItem(index: number) {
-    this.shoppingListSvc.editingStateChanged.next({ id: index, editing: true });
+    this.shoppingListSvc.editingStateChanged.next(index);
   }
 
 }

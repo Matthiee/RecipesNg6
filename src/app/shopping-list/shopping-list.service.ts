@@ -1,15 +1,14 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Ingredient } from '../shared/ingredient.model';
 import { Subject } from 'rxjs';
-import { EditingState } from '../shared/editing-state';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShoppingListService {
-
+  
   public ingredientListChanged = new Subject<Ingredient[]>();
-  public editingStateChanged = new Subject<EditingState>();
+  public editingStateChanged = new Subject<number>();
 
   private ingredients: Ingredient[] = [
     new Ingredient("Apples", 5),
@@ -50,6 +49,16 @@ export class ShoppingListService {
   public addIngredients(ingredients: Ingredient[]) {
 
     ingredients.forEach((i: Ingredient) => this.addNewOrExistingIngredient(i));
+
+    this.ingredientListChanged.next(this.ingredients.slice());
+  }
+
+  removeIngredient(ingredient: Ingredient) {
+    let index = this.ingredients.findIndex(i => i.name === ingredient.name);
+
+    if (index < 0) return;
+
+    this.ingredients.splice(index, 1);
 
     this.ingredientListChanged.next(this.ingredients.slice());
   }
