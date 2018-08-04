@@ -8,6 +8,7 @@ import { Subject } from 'rxjs';
 export class ShoppingListService {
 
   public ingredientListChanged = new Subject<Ingredient[]>();
+  public startedEditing = new Subject<number>();
 
   private ingredients: Ingredient[] = [
     new Ingredient("Apples", 5),
@@ -18,6 +19,10 @@ export class ShoppingListService {
 
   public getIngredients(): Ingredient[] {
     return this.ingredients.slice();
+  }
+
+  public getIngredient(index: number): Ingredient {
+    return this.ingredients[index];
   }
 
   public addIngredient(ingredient: Ingredient) {
