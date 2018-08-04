@@ -3,7 +3,7 @@
     <app-shopping-edit></app-shopping-edit>
     <hr />
     <ul class="list-group">
-      <li class="list-group-item flex-column" style="cursor: pointer" *ngFor="let ingredient of ingredients; let id = index"  (click)="onEditItem(id)">
+      <li class="list-group-item " style="cursor: pointer" *ngFor="let ingredient of ingredients; let id = index"  (click)="onEditItem(id)">
         <div class="d-flex w-100 justify-content-between">
           {{ ingredient.name }}
           <span class="badge badge-primary badge-pill">{{ ingredient.amount }}</span>
