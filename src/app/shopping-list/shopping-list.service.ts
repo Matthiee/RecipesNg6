@@ -1,6 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Ingredient } from '../shared/ingredient.model';
 import { Subject } from 'rxjs';
+import { EditingState } from '../shared/editing-state';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Subject } from 'rxjs';
 export class ShoppingListService {
 
   public ingredientListChanged = new Subject<Ingredient[]>();
-  public startedEditing = new Subject<number>();
+  public editingStateChanged = new Subject<EditingState>();
 
   private ingredients: Ingredient[] = [
     new Ingredient("Apples", 5),
@@ -39,6 +40,11 @@ export class ShoppingListService {
       this.ingredients.push(ingredient);
     else
       existingIngredient.amount = +existingIngredient.amount + +ingredient.amount;
+  }
+
+  public updateIngredient(index: number, newIngredient: Ingredient) {
+    this.ingredients[index] = newIngredient;
+    this.ingredientListChanged.next(this.ingredients.slice());
   }
 
   public addIngredients(ingredients: Ingredient[]) {

@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./shopping-list.component.css']
 })
 export class ShoppingListComponent implements OnInit, OnDestroy {
-  
+
   ingredients: Ingredient[];
 
   private subscription: Subscription;
@@ -21,8 +21,8 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     this.ingredients = this.shoppingListSvc.getIngredients();
 
     this.subscription = this.shoppingListSvc.ingredientListChanged
-      .subscribe(() => {
-        this.ingredients = this.shoppingListSvc.getIngredients();
+      .subscribe((ingredients: Ingredient[]) => {
+        this.ingredients = ingredients;
       });
 
   }
@@ -32,7 +32,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   onEditItem(index: number) {
-    this.shoppingListSvc.startedEditing.next(index);
+    this.shoppingListSvc.editingStateChanged.next({ id: index, editing: true });
   }
 
 }

@@ -3,6 +3,7 @@ import { Ingredient } from '../../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list.service';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { EditingState } from '../../shared/editing-state';
 
 @Component({
   selector: 'app-shopping-edit',
@@ -14,7 +15,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   @ViewChild('f')
   frmShoppingList: NgForm;
 
-  startEditingSubscription: Subscription;
+  editingStateChangedSubscription: Subscription;
   editMode: boolean = false;
   editedItemIndex: number;
   editedIngredient: Ingredient;
@@ -23,19 +24,23 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.startEditingSubscription = this.shoppingListSvc.startedEditing
-      .subscribe(id => {
+    this.editingStateChangedSubscription = this.shoppingListSvc.editingStateChanged
+      .subscribe((state: EditingState) => {
 
-        this.editMode = true;
-        this.editedItemIndex = id;
+        this.editMode = state.editing;
 
-        this.editedIngredient = this.shoppingListSvc.getIngredient(id);
+        if (!this.editMode)
+          return;
+
+        this.editedItemIndex = state.id;
+
+        this.editedIngredient = this.shoppingListSvc.getIngredient(state.id);
 
         this.frmShoppingList.setValue({
           name: this.editedIngredient.name,
           amount: this.editedIngredient.amount
         });
-    });
+      });
 
   }
 
@@ -44,11 +49,16 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
     const value = form.value;
     const ingredient = new Ingredient(value.name, value.amount);
 
-    this.shoppingListSvc.addIngredient(ingredient);
+    if (this.editMode) {
+      this.shoppingListSvc.updateIngredient(this.editedItemIndex, ingredient);
+      this.shoppingListSvc.editingStateChanged.next({ editing: false, id: -1 });
+    }
+    else
+      this.shoppingListSvc.addIngredient(ingredient);
   }
 
   ngOnDestroy() {
-    this.startEditingSubscription.unsubscribe();
+    this.editingStateChangedSubscription.unsubscribe();
   }
 
 }
