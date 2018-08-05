@@ -15,6 +15,8 @@ namespace RecipesNg6.Database.Configuration
             builder.Property(r => r.Description).IsRequired();
             builder.Property(r => r.Name).IsRequired();
 
+            builder.HasAlternateKey(r => r.Name).HasName("AK_Name");
+
             builder.HasMany(r => r.Ingredients).WithOne(map => map.Recipe).HasForeignKey(map => map.RecipeId);
 
 
