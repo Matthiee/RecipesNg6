@@ -14,7 +14,7 @@ namespace RecipesNg6.Database.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(maxLength: 100, nullable: false),
                     Amount = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -28,7 +28,7 @@ namespace RecipesNg6.Database.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(maxLength: 100, nullable: false),
                     DateCreated = table.Column<DateTime>(nullable: false),
                     ImagePath = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: false)

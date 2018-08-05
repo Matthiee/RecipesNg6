@@ -10,7 +10,7 @@ using RecipesNg6.Database;
 namespace RecipesNg6.Database.Migrations
 {
     [DbContext(typeof(RecipeDbContext))]
-    [Migration("20180805100908_Initial")]
+    [Migration("20180805150656_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,7 +31,8 @@ namespace RecipesNg6.Database.Migrations
                         .IsRequired();
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 
@@ -53,7 +54,8 @@ namespace RecipesNg6.Database.Migrations
                         .IsRequired();
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 

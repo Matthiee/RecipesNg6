@@ -29,12 +29,10 @@ namespace RecipesNg6.Database.Migrations
                         .IsRequired();
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
-
-                    b.HasAlternateKey("Name")
-                        .HasName("AK_Name");
 
                     b.ToTable("Ingredients");
                 });
@@ -54,12 +52,10 @@ namespace RecipesNg6.Database.Migrations
                         .IsRequired();
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
-
-                    b.HasAlternateKey("Name")
-                        .HasName("AK_Name");
 
                     b.ToTable("Recipes");
                 });

@@ -7,6 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RecipesNg6.Database;
+using AutoMapper;
+using System.Reflection;
+using System;
+using System.Linq;
+using RecipesNg6.Core.Mapping;
 
 namespace RecipesNg6
 {
@@ -28,6 +33,8 @@ namespace RecipesNg6
                     sqlOptions => sqlOptions.EnableRetryOnFailure().MigrationsAssembly("RecipesNg6.Database"));
                 options.EnableSensitiveDataLogging(Configuration.GetValue<bool>("Database:SensitiveDataLogging"));
             });
+
+            services.AddAutoMapper(typeof(RecipeProfile).Assembly);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

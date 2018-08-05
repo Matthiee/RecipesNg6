@@ -11,13 +11,19 @@ namespace RecipesNg6.Database.Configuration
     {
         public void Configure(EntityTypeBuilder<Recipe> builder)
         {
-            builder.Property(r => r.ImagePath).IsRequired();
-            builder.Property(r => r.Description).IsRequired();
-            builder.Property(r => r.Name).IsRequired();
+            builder.Property(r => r.ImagePath)
+                .IsRequired();
 
-            builder.HasAlternateKey(r => r.Name).HasName("AK_Name");
+            builder.Property(r => r.Description)
+                .IsRequired();
 
-            builder.HasMany(r => r.Ingredients).WithOne(map => map.Recipe).HasForeignKey(map => map.RecipeId);
+            builder.Property(r => r.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.HasMany(r => r.Ingredients)
+                .WithOne(map => map.Recipe)
+                .HasForeignKey(map => map.RecipeId);
 
 
         }
