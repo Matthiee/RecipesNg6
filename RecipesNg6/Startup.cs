@@ -36,6 +36,8 @@ namespace RecipesNg6
 
             services.AddAutoMapper(typeof(RecipeProfile).Assembly);
 
+            services.AddCors(opt => opt.AddDefaultPolicy(cfg => cfg.AllowAnyOrigin()));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // In production, the Angular files will be served from this directory
@@ -58,7 +60,9 @@ namespace RecipesNg6
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            app.UseCors();
+
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
