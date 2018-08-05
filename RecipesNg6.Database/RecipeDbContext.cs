@@ -24,6 +24,7 @@ namespace RecipesNg6.Database
 
             builder.ApplyConfiguration(new IngredientConfiguration());
             builder.ApplyConfiguration(new RecipeConfiguration());
+            builder.ApplyConfiguration(new RecipeIngredientMapConfiguration());
         }
 
     }

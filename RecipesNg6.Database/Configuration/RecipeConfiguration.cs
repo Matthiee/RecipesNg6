@@ -11,7 +11,13 @@ namespace RecipesNg6.Database.Configuration
     {
         public void Configure(EntityTypeBuilder<Recipe> builder)
         {
-            throw new NotImplementedException();
+            builder.Property(r => r.ImagePath).IsRequired();
+            builder.Property(r => r.Description).IsRequired();
+            builder.Property(r => r.Name).IsRequired();
+
+            builder.HasMany(r => r.Ingredients).WithOne(map => map.Recipe).HasForeignKey(map => map.RecipeId);
+
+
         }
     }
 }

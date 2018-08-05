@@ -24,9 +24,9 @@ namespace RecipesNg6
         {
             services.AddDbContext<RecipeDbContext>(options =>
             {
-                options.UseSqlServer(Configuration["Database.ConnectionString"],
+                options.UseSqlServer(Configuration["Database:ConnectionString"],
                     sqlOptions => sqlOptions.EnableRetryOnFailure().MigrationsAssembly("RecipesNg6.Database"));
-                options.EnableSensitiveDataLogging(Configuration.GetValue<bool>("Database.SensitiveDataLogging"));
+                options.EnableSensitiveDataLogging(Configuration.GetValue<bool>("Database:SensitiveDataLogging"));
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

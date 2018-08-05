@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RecipesNg6.Core.Models;
 
 namespace RecipesNg6.Database.Configuration
 {
@@ -10,7 +11,10 @@ namespace RecipesNg6.Database.Configuration
     {
         public void Configure(EntityTypeBuilder<Ingredient> builder)
         {
+            builder.Property(i => i.Name).IsRequired();
+            builder.Property(i => i.Amount).IsRequired();
 
+            builder.HasMany(i => i.Recipes).WithOne(map => map.Ingredient).HasForeignKey(map => map.IngredientId);
         }
     }
 }

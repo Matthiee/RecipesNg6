@@ -13,6 +13,6 @@ namespace RecipesNg6.Core.Models
         public string ImagePath { get; set; }
         public string Description { get; set; }
 
-        public ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
+        public ICollection<RecipeIngredientMap> Ingredients { get; set; } = new List<RecipeIngredientMap>();
     }
 }
