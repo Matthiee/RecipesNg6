@@ -3,8 +3,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RecipesNg6.Database;
+using AutoMapper;
+using System.Reflection;
+using System;
+using System.Linq;
+using RecipesNg6.Core.Mapping;
 
 namespace RecipesNg6
 {
@@ -20,6 +27,15 @@ namespace RecipesNg6
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<RecipeDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration["Database:ConnectionString"],
+                    sqlOptions => sqlOptions.EnableRetryOnFailure().MigrationsAssembly("RecipesNg6.Database"));
+                options.EnableSensitiveDataLogging(Configuration.GetValue<bool>("Database:SensitiveDataLogging"));
+            });
+
+            services.AddAutoMapper(typeof(RecipeProfile).Assembly);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // In production, the Angular files will be served from this directory
