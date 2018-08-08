@@ -5,14 +5,16 @@ using System.Text;
 
 namespace RecipesNg6.Core.Models.Dto
 {
-    public class RecipeDto
+    public class CreateUpdateRecipeDto
     {
-        public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
-        public string Description { get; set; }
-        public string ImagePath { get; set; }
 
-        public DateTime DateCreated { get; set; }
+        [Required]
+        public string Description { get; set; }
+
+        [Required, Url]
+        public string ImagePath { get; set; }
 
         public IReadOnlyCollection<IngredientDto> Ingredients { get; set; }
     }

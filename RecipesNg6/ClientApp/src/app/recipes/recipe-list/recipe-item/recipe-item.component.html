@@ -1,6 +1,6 @@
 <div class="list-group">
   <a style="cursor: pointer"
-     [routerLink]="[index]"
+     routerLink="{{ recipe.id }}"
      routerLinkActive="active"
      class="list-group-item list-group-item-action flex-column align-items-start">
     <div class="d-flex w-100 justify-content-between">
@@ -10,7 +10,7 @@
     <div class="d-flex w-100 justify-content-between">
       <p class="mr-2">{{ recipe.description }}</p>
       <div class="img-thumbnail" style="width: 100px">
-        <img [src]="recipe.imagePath" alt="{{ recipe.name }}" class="img-fluid" style="display: block"/>
+        <img [src]="recipe.imagePath" alt="{{ recipe.name }}" class="img-fluid" style="display: block" />
       </div>
     </div>
   </a>

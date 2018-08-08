@@ -11,11 +11,11 @@ namespace RecipesNg6.Core.Mapping
     {
         public RecipeProfile()
         {
-            CreateMap<Recipe, RecipeDto>()
-                .ForMember(r => r.DateCreated, opt => opt.AllowNull());
-
-            CreateMap<RecipeDto, Recipe>()
+            CreateMap<CreateUpdateRecipeDto, Recipe>()
                 .ForMember(r => r.Id, opt => opt.Ignore())
+                .ForMember(r => r.DateCreated, opt => opt.Ignore());
+
+            CreateMap<Recipe, RecipeDto>()
                 .ForMember(r => r.DateCreated, opt => opt.AllowNull());
         }
 

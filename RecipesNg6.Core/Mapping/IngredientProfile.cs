@@ -12,10 +12,10 @@ namespace RecipesNg6.Core.Mapping
 
         public IngredientProfile()
         {
-            CreateMap<Ingredient, IngredientDto>();
-
-            CreateMap<IngredientDto, Ingredient>()
+            CreateMap<CreateUpdateIngredientDto, Ingredient>()
                 .ForMember(i => i.Id, opt => opt.Ignore());
+
+            CreateMap<Ingredient, IngredientDto>();
         }
 
     }

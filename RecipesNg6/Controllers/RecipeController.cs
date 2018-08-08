@@ -51,7 +51,7 @@ namespace RecipesNg6.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRecipe([FromRoute] int id, [FromBody] RecipeDto receivedRecipe)
+        public async Task<IActionResult> UpdateRecipe([FromRoute] int id, [FromBody] CreateUpdateRecipeDto receivedRecipe)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -69,7 +69,7 @@ namespace RecipesNg6.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddRecipe([FromBody] RecipeDto receivedRecipe)
+        public async Task<IActionResult> AddRecipe([FromBody] CreateUpdateRecipeDto receivedRecipe)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

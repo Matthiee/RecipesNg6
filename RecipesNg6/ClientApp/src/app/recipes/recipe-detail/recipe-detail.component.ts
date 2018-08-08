@@ -3,6 +3,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Recipe } from '../recipe.model';
 import { RecipeService } from '../recipe.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -21,7 +22,7 @@ export class RecipeDetailComponent implements OnInit {
     this.route.params
       .subscribe((params: Params) => {
         this.id = +params['id'];
-        this.recipe = this.recipeSvc.getRecipe(this.id);
+        this.recipeSvc.getRecipe(this.id).subscribe(recipe => this.recipe = recipe);
       });
 
   }

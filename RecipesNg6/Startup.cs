@@ -36,7 +36,7 @@ namespace RecipesNg6
 
             services.AddAutoMapper(typeof(RecipeProfile).Assembly);
 
-            services.AddCors(opt => opt.AddDefaultPolicy(cfg => cfg.AllowAnyOrigin()));
+            services.AddCors(opt => opt.AddDefaultPolicy(cfg => cfg.AllowAnyOrigin().AllowAnyMethod().AllowCredentials().AllowAnyHeader()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

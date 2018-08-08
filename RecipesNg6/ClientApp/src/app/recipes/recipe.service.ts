@@ -2,54 +2,66 @@ import { Injectable } from '@angular/core';
 import { Recipe } from './recipe.model';
 import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { DataStorageService } from '../shared/data-storage.service';
+import { flatMap, filter } from 'rxjs/operators';
+import { dashCaseToCamelCase } from '@angular/compiler/src/util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeService {
 
-  public recipeListChanged = new Subject<Recipe[]>();
+  public recipeListChanged = new Subject<void>();
 
   constructor(private shoppingListSvc: ShoppingListService, private db: DataStorageService) { }
 
-  private recipes: Recipe[];
+  updateRecipe(recipe: Recipe) {
 
-  updateRecipe(index: number, recipe: Recipe) {
-    this.recipes[index] = recipe;
+    this.db.updateRecipe(recipe)
+      .subscribe(
+        done => {
 
-    this.recipeListChanged.next(this.getRecipes());
+          this.db.getRecipes()
+            .pipe(flatMap(d => d), filter(d => d.id === recipe.id))
+            .subscribe(
+              result => {
+
+                result = recipe;
+
+                this.recipeListChanged.next();
+
+              },
+              err => console.error(err));
+
+        },
+        error => console.error(error));
   }
 
   addRecipe(recipe: Recipe) {
-    this.recipes.push(recipe);
 
-    this.recipeListChanged.next(this.getRecipes());
+    this.db.addRecipe(recipe).subscribe(
+      succes => {
+
+        this.db.getRecipes().subscribe(recipes => recipes.push(succes), err => console.error(err));
+
+      }, error => console.error(error));
+
+    this.recipeListChanged.next();
   }
 
-  getRecipes(): Recipe[] {
+  getRecipes(): Observable<Recipe[]> {
 
-    if (this.recipes)
-      return this.recipes.slice();
+    let obs = this.db.getRecipes();
 
-    let recipes = this.db.getRecipes().subscribe(
-      (resp) => {
+    obs.subscribe(null, err => console.error(err));
 
-        this.recipes = resp;
+    return obs;
 
-        this.recipeListChanged.next(this.getRecipes());
-
-      },
-      error => {
-        console.log(error);
-      });
-
-    return [];
   }
 
-  getRecipe(id: number): Recipe {
-    return this.getRecipes().find(r => r.id === id);
+  getRecipe(id: number): Observable<Recipe> {
+    return this.db.getRecipes().pipe(flatMap((data) => data), filter((data) => data.id === id));
   }
 
   addIngredientsToShoppingList(ingredients: Ingredient[]) {
@@ -57,9 +69,7 @@ export class RecipeService {
   }
 
   deleteRecipe(index: number) {
-
-    this.recipes.splice(index, 1);
-
-    this.recipeListChanged.next(this.getRecipes());
+    
+    this.recipeListChanged.next();
   }
 }
