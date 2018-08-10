@@ -13,7 +13,7 @@ using RecipesNg6.Database;
 
 namespace RecipesNg6.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class RecipeController : Controller
     {
         private readonly RecipeDbContext db;

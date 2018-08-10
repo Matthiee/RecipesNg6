@@ -19,16 +19,16 @@ export class RecipeEditComponent implements OnInit {
   constructor(private route: ActivatedRoute, private recipeSvc: RecipeService, private router: Router) { }
 
   ngOnInit() {
-    this.route.params.subscribe((params: Params) => {
+    this.route.params.subscribe(async (params: Params) => {
 
       this.id = +params['id'];
       this.editMode = params['id'] != null;
 
-      this.initForm();
+      await this.initForm();
     });
   }
 
-  private initForm() {
+  private async initForm() {
 
     let recipeName = '';
     let recipeImgPath = '';
@@ -36,20 +36,20 @@ export class RecipeEditComponent implements OnInit {
     let recipeIngredients = new FormArray([]);
 
     if (this.editMode) {
-      this.recipeSvc.getRecipe(this.id).subscribe(recipe => {
-        recipeName = recipe.name;
-        recipeImgPath = recipe.imagePath;
-        recipeDesc = recipe.description;
+      let recipe = await this.recipeSvc.getRecipe(this.id).toPromise();
 
-        if (recipe['ingredients']) {
-          for (let i of recipe.ingredients) {
-            recipeIngredients.push(new FormGroup({
-              'name': new FormControl(i.name, Validators.required),
-              'amount': new FormControl(i.amount, Validators.required)
-            }));
-          }
+      recipeName = recipe.name;
+      recipeImgPath = recipe.imagePath;
+      recipeDesc = recipe.description;
+
+      if (recipe['ingredients']) {
+        for (let i of recipe.ingredients) {
+          recipeIngredients.push(new FormGroup({
+            'name': new FormControl(i.name, Validators.required),
+            'amount': new FormControl(i.amount, Validators.required)
+          }));
         }
-      });
+      }
     }
 
     this.recipeForm = new FormGroup({
@@ -62,7 +62,7 @@ export class RecipeEditComponent implements OnInit {
 
   onSubmit() {
     if (this.editMode)
-      this.recipeSvc.updateRecipe(this.recipeForm.value);
+      this.recipeSvc.updateRecipe(this.id, this.recipeForm.value);
     else
       this.recipeSvc.addRecipe(this.recipeForm.value);
 
