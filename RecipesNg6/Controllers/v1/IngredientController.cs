@@ -2,7 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RecipesNg6.Core.Models;
+using RecipesNg6.Core.Models.Dto;
+using RecipesNg6.Database;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,36 +17,70 @@ namespace RecipesNg6.Controllers
     [Route("api/v1/[controller]")]
     public class IngredientController : Controller
     {
-        // GET: api/<controller>
+        private readonly RecipeDbContext db;
+        private readonly IMapper mapper;
+
+        public IngredientController(RecipeDbContext db, IMapper mapper)
+        {
+            this.db = db;
+            this.mapper = mapper;
+        }
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<IngredientDto> GetAll()
         {
-            return new string[] { "value1", "value2" };
+            return db.Ingredients
+                .ProjectTo<IngredientDto>(mapper.ConfigurationProvider);
         }
 
-        // GET api/<controller>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<IngredientDto>> GetById(int id)
         {
-            return "value";
+            var recipe = await db.Ingredients
+                .FirstAsync(r => r.Id == id);
+
+            if (recipe == null)
+                return NotFound();
+
+            var dto = mapper.Map<IngredientDto>(recipe);
+
+            return Ok(dto);
         }
 
-        // POST api/<controller>
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/<controller>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<IActionResult> UpdateRecipe([FromRoute] int id, [FromBody] CreateUpdateIngredientDto receivedIngredient)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var ingredient = await db.Ingredients.FindAsync(id);
+
+            if (ingredient == null)
+                return NotFound();
+
+            mapper.Map(receivedIngredient, ingredient);
+
+            var x = await db.SaveChangesAsync();
+
+            return NoContent();
         }
 
-        // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpPost]
+        public async Task<IActionResult> AddIngredient([FromBody] CreateUpdateIngredientDto receivedIngredient)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (await db.Ingredients.AnyAsync(r => r.Name == receivedIngredient.Name))
+                return BadRequest("already exists");
+
+            var ingredient = mapper.Map<Ingredient>(receivedIngredient);
+
+            db.Ingredients.Add(ingredient);
+
+            await db.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetById), new { id = ingredient.Id }, ingredient);
         }
     }
 }

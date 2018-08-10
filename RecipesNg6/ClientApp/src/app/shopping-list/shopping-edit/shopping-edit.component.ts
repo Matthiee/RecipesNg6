@@ -16,7 +16,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
 
   editingStateChangedSubscription: Subscription;
   editMode: boolean = false;
-  editedItemIndex: number;
+  editedItemId: number;
   editedIngredient: Ingredient;
 
   constructor(private shoppingListSvc: ShoppingListService) { }
@@ -24,13 +24,13 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.editingStateChangedSubscription = this.shoppingListSvc.editingStateChanged
-      .subscribe(id => {
+      .subscribe(async id => {
 
         this.editMode = true;
 
-        this.editedItemIndex = id;
+        this.editedItemId = id;
 
-        this.editedIngredient = this.shoppingListSvc.getIngredient(id);
+        this.editedIngredient = await this.shoppingListSvc.getIngredient(id).toPromise();
 
         this.frmShoppingList.setValue({
           name: this.editedIngredient.name,
@@ -46,7 +46,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
     const ingredient = new Ingredient(value.name, value.amount);
 
     if (this.editMode) {
-      this.shoppingListSvc.updateIngredient(this.editedItemIndex, ingredient);
+      this.shoppingListSvc.updateIngredient(this.editedItemId, ingredient);
     }
     else
       this.shoppingListSvc.addIngredient(ingredient);
