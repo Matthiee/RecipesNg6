@@ -12,6 +12,8 @@ namespace RecipesNg6.Database.Configuration
         public void Configure(EntityTypeBuilder<RecipeIngredientMap> builder)
         {
             builder.HasKey(map => new { map.RecipeId, map.IngredientId });
+
+            builder.Property(map => map.Amount).IsRequired();
         }
     }
 }
