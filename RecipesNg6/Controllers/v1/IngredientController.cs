@@ -27,14 +27,14 @@ namespace RecipesNg6.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<IngredientDto> GetAll()
+        public IEnumerable<IngredientListItemDto> GetAll()
         {
             return db.Ingredients
-                .ProjectTo<IngredientDto>(mapper.ConfigurationProvider);
+                .ProjectTo<IngredientListItemDto>(mapper.ConfigurationProvider);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<IngredientDto>> GetById(int id)
+        public async Task<ActionResult<IngredientListItemDto>> GetById(int id)
         {
             var recipe = await db.Ingredients
                 .FirstAsync(r => r.Id == id);
@@ -42,7 +42,7 @@ namespace RecipesNg6.Controllers
             if (recipe == null)
                 return NotFound();
 
-            var dto = mapper.Map<IngredientDto>(recipe);
+            var dto = mapper.Map<IngredientListItemDto>(recipe);
 
             return Ok(dto);
         }

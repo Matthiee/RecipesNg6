@@ -27,6 +27,8 @@ namespace RecipesNg6.Core.Mapping
             CreateMap<Ingredient, IngredientDto>()
                 .ForMember(i => i.Amount, opt => opt.Ignore());
 
+            CreateMap<Ingredient, IngredientDto>();
+
             CreateMap<RecipeIngredientMap, IngredientDto>()
                 .ForMember(i => i.Name, opt => opt.MapFrom(map => map.Ingredient.Name))
                 .ForMember(i => i.Id, opt => opt.MapFrom(map => map.IngredientId));
