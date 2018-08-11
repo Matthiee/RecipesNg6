@@ -12,15 +12,24 @@ namespace RecipesNg6.Core.Mapping
 
         public IngredientProfile()
         {
-            CreateMap<CreateUpdateIngredientDto, Ingredient>()
-                .ForMember(i => i.Id, opt => opt.Ignore());
+            CreateMap<IngredientDto, RecipeIngredientMap>()
+                .ForMember(i => i.IngredientId, opt => opt.Ignore())
+                .ForMember(i => i.RecipeId, opt => opt.Ignore())
+                .ForMember(i => i.Recipe, opt => opt.Ignore())
+                .ForMember(i => i.Ingredient, opt => opt.MapFrom(_ => _));
+
+            CreateMap<CreateUpdateIngredientDto, RecipeIngredientMap>()
+                .ForMember(i => i.IngredientId, opt => opt.Ignore())
+                .ForMember(i => i.RecipeId, opt => opt.Ignore())
+                .ForMember(i => i.Recipe, opt => opt.Ignore())
+                .ForMember(i => i.Ingredient, opt => opt.MapFrom(_ => _));
 
             CreateMap<Ingredient, IngredientDto>()
                 .ForMember(i => i.Amount, opt => opt.Ignore());
 
             CreateMap<RecipeIngredientMap, IngredientDto>()
-                .ForMember(i => i.Name, opt => opt.ResolveUsing(map => map.Ingredient.Name))
-                .ForMember(i => i.Id, opt => opt.ResolveUsing(map => map.IngredientId));
+                .ForMember(i => i.Name, opt => opt.MapFrom(map => map.Ingredient.Name))
+                .ForMember(i => i.Id, opt => opt.MapFrom(map => map.IngredientId));
         }
 
     }

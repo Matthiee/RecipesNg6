@@ -31,7 +31,7 @@ namespace RecipesNg6.Controllers
             return db.Recipes
                 .Include(r => r.Ingredients)
                 .ThenInclude(map => map.Ingredient)
-                .ProjectTo<RecipeDto>(mapper.ConfigurationProvider); // TODO fix projectTo error?
+                .ProjectTo<RecipeDto>(mapper.ConfigurationProvider);
         }
 
         [HttpGet("{id}")]

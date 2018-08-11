@@ -17,10 +17,7 @@ namespace RecipesNg6.Core.Mapping
 
             CreateMap<Recipe, RecipeDto>()
                 .ForMember(r => r.DateCreated, opt => opt.AllowNull())
-                .ForMember(r => r.Ingredients, opt =>
-                {
-                    opt.MapFrom(x => x.Ingredients);
-                });
+                .ForMember(r => r.Ingredients, opt => opt.MapFrom(x => x.Ingredients));
 
             CreateMap<RecipeIngredientMap, RecipeDto>()
                 .ForAllMembers(opt => opt.MapFrom(map => map.Recipe));
