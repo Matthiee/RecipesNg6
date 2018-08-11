@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RecipesNg6.Core.Models;
 using RecipesNg6.Core.Models.Dto;
 using RecipesNg6.Database;
@@ -19,11 +21,13 @@ namespace RecipesNg6.Controllers
     {
         private readonly RecipeDbContext db;
         private readonly IMapper mapper;
+        private readonly ILogger logger;
 
-        public IngredientController(RecipeDbContext db, IMapper mapper)
+        public IngredientController(RecipeDbContext db, IMapper mapper, ILogger<IngredientController> logger)
         {
             this.db = db;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -34,53 +38,83 @@ namespace RecipesNg6.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<IngredientListItemDto>> GetById(int id)
+        public async Task<ActionResult<IngredientListItemDto>> GetById(int id, CancellationToken cancellation)
         {
-            var recipe = await db.Ingredients
-                .FirstAsync(r => r.Id == id);
+            try
+            {
+                var recipe = await db.Ingredients
+                    .FirstAsync(r => r.Id == id);
 
-            if (recipe == null)
-                return NotFound();
+                if (recipe == null)
+                    return NotFound();
 
-            var dto = mapper.Map<IngredientListItemDto>(recipe);
+                cancellation.ThrowIfCancellationRequested();
 
-            return Ok(dto);
+                var dto = mapper.Map<IngredientListItemDto>(recipe);
+
+                return Ok(dto);
+            }
+            catch (OperationCanceledException)
+            {
+                logger.LogInformation($"{nameof(IngredientController)}::{nameof(GetById)} got cancelled");
+                throw;
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRecipe([FromRoute] int id, [FromBody] CreateUpdateIngredientDto receivedIngredient)
+        public async Task<IActionResult> UpdateRecipe([FromRoute] int id, [FromBody] CreateUpdateIngredientDto receivedIngredient, CancellationToken cancellation)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var ingredient = await db.Ingredients.FindAsync(id);
+                var ingredient = await db.Ingredients.FindAsync(id);
 
-            if (ingredient == null)
-                return NotFound();
+                if (ingredient == null)
+                    return NotFound();
 
-            mapper.Map(receivedIngredient, ingredient);
+                cancellation.ThrowIfCancellationRequested();
 
-            var x = await db.SaveChangesAsync();
+                mapper.Map(receivedIngredient, ingredient);
 
-            return NoContent();
+                var x = await db.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (OperationCanceledException)
+            {
+                logger.LogInformation($"{nameof(IngredientController)}::{nameof(UpdateRecipe)} got cancelled");
+                throw;
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddIngredient([FromBody] CreateUpdateIngredientDto receivedIngredient)
+        public async Task<IActionResult> AddIngredient([FromBody] CreateUpdateIngredientDto receivedIngredient, CancellationToken cancellation)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            if (await db.Ingredients.AnyAsync(r => r.Name == receivedIngredient.Name))
-                return BadRequest("already exists");
+                if (await db.Ingredients.AnyAsync(r => r.Name == receivedIngredient.Name))
+                    return BadRequest("already exists");
 
-            var ingredient = mapper.Map<Ingredient>(receivedIngredient);
+                cancellation.ThrowIfCancellationRequested();
 
-            db.Ingredients.Add(ingredient);
+                var ingredient = mapper.Map<Ingredient>(receivedIngredient);
 
-            await db.SaveChangesAsync();
+                db.Ingredients.Add(ingredient);
 
-            return CreatedAtAction(nameof(GetById), new { id = ingredient.Id }, ingredient);
+                await db.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetById), new { id = ingredient.Id }, ingredient);
+            }
+            catch (OperationCanceledException)
+            {
+                logger.LogInformation($"{nameof(IngredientController)}::{nameof(AddIngredient)} got cancelled");
+                throw;
+            }
         }
     }
 }
