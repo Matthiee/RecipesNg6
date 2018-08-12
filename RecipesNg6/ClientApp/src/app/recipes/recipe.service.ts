@@ -2,60 +2,111 @@ import { Injectable } from '@angular/core';
 import { Recipe } from './recipe.model';
 import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { DataStorageService } from '../shared/data-storage.service';
-import { flatMap, filter } from 'rxjs/operators';
+import { flatMap, filter, switchMap, first } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeService {
 
-  constructor(private shoppingListSvc: ShoppingListService, private db: DataStorageService) { }
+  private _recipes: BehaviorSubject<Recipe[]> = new BehaviorSubject([]);
 
-  updateRecipe(id: number, recipe: Recipe) {
+  constructor(private shoppingListSvc: ShoppingListService, private db: DataStorageService) {
+    this.loadInitialRecipes();
+  }
+
+  private loadInitialRecipes(): void {
+    this.db.getRecipes().pipe(first()).subscribe(
+      recipes => {
+
+        console.info(`Loaded ${recipes.length} recipes`, 'color: green');
+
+        this._recipes.next(recipes);
+
+      },
+      error => this._recipes.error(error));
+  }
+
+  public getRecipes(id?: number): Observable<Recipe[]> {
+    return this._recipes.asObservable();
+  }
+
+  public getRecipe(id: number): Observable<Recipe> {
+    return this._recipes.pipe(
+      switchMap(_ => _),
+      filter(_ => _.id === id)
+    );
+  }
+
+  public updateRecipe(id: number, recipe: Recipe): void {
+
+    recipe.id = id;
 
     this.db.updateRecipe(id, recipe)
+      .pipe(
+        first())
       .subscribe(
         done => {
 
-          this.db.getRecipes()
-            .pipe(flatMap(d => d), filter(d => d.id === recipe.id))
-            .subscribe(
-              result => result = recipe,
-              err => console.error(err));
+          console.info(`Updated #${recipe.id} ${recipe.name} in the DB!`, 'color: green');
 
+          let recipes = this._recipes.value;
+
+          const idx = recipes.findIndex(r => r.id === id);
+
+          recipes[idx] = recipe;
+
+          this._recipes.next(recipes);
         },
-        error => console.error(error));
+        err => this._recipes.error(err));
   }
 
-  addRecipe(recipe: Recipe) {
+  public addRecipe(recipe: Recipe): void {
 
-    this.db.addRecipe(recipe).subscribe(
-      succes => {
+    this.db.addRecipe(recipe)
+      .pipe(
+        first())
+      .subscribe(
+        result => {
 
-        this.db.getRecipes().subscribe(recipes => recipes.push(succes), err => console.error(err));
+          console.info(`Added ${recipe.name} in the DB!`, 'color: green');
 
-      }, error => console.error(error));
-  }
+          let recipes = this._recipes.value;
 
-  getRecipes(): Observable<Recipe[]> {
+          recipes.push(result);
 
-    let obs = this.db.getRecipes();
-
-    return obs;
-
-  }
-
-  getRecipe(id: number): Observable<Recipe> {
-    return this.db.getRecipes().pipe(flatMap(_ => _), filter(_ => _.id === id));
+          this._recipes.next(recipes);
+        },
+        err => this._recipes.error(err));
   }
 
   addIngredientsToShoppingList(ingredients: Ingredient[]) {
     this.shoppingListSvc.addIngredients(ingredients);
   }
 
-  deleteRecipe(index: number) {
+  deleteRecipe(id: number) {
+
+    this.db.removeRecipe(id)
+      .pipe(
+        first())
+      .subscribe(
+        result => {
+
+          console.info(`Removed recipes #${id} from the DB!`, 'color: green');
+
+          let recipes = this._recipes.value;
+
+          const idx = recipes.findIndex(r => r.id === id);
+
+          const removedRecipes = recipes.splice(idx, 1);
+
+          if (!!removedRecipes && removedRecipes.length > 0)
+            this._recipes.next(recipes);
+
+        },
+      err => this._recipes.error(err));
 
   }
 }

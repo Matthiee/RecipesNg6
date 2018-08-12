@@ -43,7 +43,7 @@ namespace RecipesNg6.Controllers
             try
             {
                 var recipe = await db.Ingredients
-                    .FirstAsync(r => r.Id == id);
+                    .FirstAsync(r => r.Id == id, cancellation);
 
                 if (recipe == null)
                     return NotFound();
@@ -69,7 +69,7 @@ namespace RecipesNg6.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var ingredient = await db.Ingredients.FindAsync(id);
+                var ingredient = await db.Ingredients.FindAsync(id, cancellation);
 
                 if (ingredient == null)
                     return NotFound();
@@ -78,7 +78,7 @@ namespace RecipesNg6.Controllers
 
                 mapper.Map(receivedIngredient, ingredient);
 
-                var x = await db.SaveChangesAsync();
+                await db.SaveChangesAsync(cancellation);
 
                 return NoContent();
             }
@@ -97,7 +97,7 @@ namespace RecipesNg6.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                if (await db.Ingredients.AnyAsync(r => r.Name == receivedIngredient.Name))
+                if (await db.Ingredients.AnyAsync(r => r.Name == receivedIngredient.Name, cancellation))
                     return BadRequest("already exists");
 
                 cancellation.ThrowIfCancellationRequested();
@@ -106,7 +106,7 @@ namespace RecipesNg6.Controllers
 
                 db.Ingredients.Add(ingredient);
 
-                await db.SaveChangesAsync();
+                await db.SaveChangesAsync(cancellation);
 
                 return CreatedAtAction(nameof(GetById), new { id = ingredient.Id }, ingredient);
             }

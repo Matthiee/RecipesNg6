@@ -93,10 +93,12 @@ namespace RecipesNg6.Controllers
                     .ForEachAsync(i =>
                     {
                         // Set the id of each mapped ingredient to the one from the db
-                        recipe.Ingredients.Select(map => map.Ingredient).First(_ => _.Name == i.Name).Id = i.Id;
-                    });
+                        var map = recipe.Ingredients.First(_ => _.Ingredient.Name == i.Name);
+                        map.IngredientId = i.Id;
 
-                await db.SaveChangesAsync();
+                    }, cancellation);
+
+                await db.SaveChangesAsync(cancellation);
 
                 return NoContent();
             }
@@ -115,7 +117,7 @@ namespace RecipesNg6.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                if (await db.Recipes.AnyAsync(r => r.Name == receivedRecipe.Name))
+                if (await db.Recipes.AnyAsync(r => r.Name == receivedRecipe.Name, cancellation))
                     return BadRequest("already exists");
 
                 cancellation.ThrowIfCancellationRequested();
@@ -136,11 +138,13 @@ namespace RecipesNg6.Controllers
                     {
                         // Set the id of each mapped ingredient to the one from the db
                         recipe.Ingredients.Select(map => map.Ingredient).First(_ => _.Name == i.Name).Id = i.Id;
-                    });
+                    }, cancellation);
 
-                await db.SaveChangesAsync();
+                await db.SaveChangesAsync(cancellation);
 
-                return CreatedAtAction(nameof(GetById), new { id = recipe.Id }, recipe);
+                cancellation.ThrowIfCancellationRequested();
+
+                return CreatedAtAction(nameof(GetById), new { id = recipe.Id }, mapper.Map<RecipeDto>(recipe));
             }
             catch (OperationCanceledException)
             {

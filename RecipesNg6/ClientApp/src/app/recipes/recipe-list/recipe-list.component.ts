@@ -11,12 +11,15 @@ import { Observable } from 'rxjs';
 })
 export class RecipeListComponent implements OnInit {
 
-  recipes: Observable<Recipe[]>;
+  recipes: Recipe[];
 
   constructor(private recipeSvc: RecipeService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.recipes = this.recipeSvc.getRecipes();
+    this.recipeSvc.getRecipes().subscribe(r => {
+      console.log(r);
+      this.recipes = r;
+    });
   }
 
   onNewRecipe() {

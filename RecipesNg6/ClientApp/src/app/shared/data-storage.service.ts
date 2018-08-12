@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RecipeService } from '../recipes/recipe.service';
 import { Recipe } from '../recipes/recipe.model';
-import { Observable, ReplaySubject } from 'rxjs';
-import { CacheService } from './cache.service';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Ingredient } from './ingredient.model';
+import { tap, first } from 'rxjs/operators';
 
 const RECIPE_EP: string = 'Recipe';
 const INGREDIENT_EP: string = 'Ingredient';
@@ -14,21 +14,21 @@ const INGREDIENT_EP: string = 'Ingredient';
   providedIn: 'root'
 })
 export class DataStorageService {
-
   
+  private inflightRequests: Map<string, Subject<any>> = new Map();
 
 
-  constructor(private http: HttpClient, private cache: CacheService) { }
+  constructor(private http: HttpClient) { }
 
   // *********************************
   // Recipes
   // *********************************
 
-  getRecipes(refresh?: boolean): Observable<Recipe[]> {
+  getRecipes(): Observable<Recipe[]> {
 
     let req = this.http.get<Recipe[]>(environment.apiUrl + RECIPE_EP);
 
-    return this.cache.getOrAdd('getRecipes', req, refresh);
+    return this.checkRequestIsInFlight("getRecipes", req);
   }
 
   addRecipe(recipe: Recipe): Observable<Recipe> {
@@ -39,19 +39,19 @@ export class DataStorageService {
     return this.http.put(environment.apiUrl + RECIPE_EP + '/' + id, recipe);
   }
 
-  removeRecipe(recipe: Recipe) {
-    return this.http.delete(environment.apiUrl + RECIPE_EP + '/' + recipe.id);
+  removeRecipe(id: number) {
+    return this.http.delete(environment.apiUrl + RECIPE_EP + '/' + id);
   }
 
   // *********************************
   // Ingredients
   // *********************************
 
-  getIngredients(refresh?: boolean): Observable<Ingredient[]> {
+  getIngredients(): Observable<Ingredient[]> {
 
     let req = this.http.get<Ingredient[]>(environment.apiUrl + INGREDIENT_EP);
 
-    return this.cache.getOrAdd('getIngredients', req, refresh);
+    return this.checkRequestIsInFlight("getIngredients", req);
   }
 
   addIngredient(ingredient: Ingredient): Observable<Ingredient> {
@@ -66,5 +66,39 @@ export class DataStorageService {
     return this.http.delete(environment.apiUrl + INGREDIENT_EP + '/' + ingredient.id);
   }
 
+
+  // *****************************
+
+  private checkRequestIsInFlight<T>(key: string, fallback: Observable<T>): Observable<T> | Subject<T> {
+    if (this.inflightRequests.has(key))
+      return this.inflightRequests.get(key);
+
+     this.inflightRequests.set(key, new Subject<T>());
+
+    return fallback.pipe(
+      first(),
+      tap(val => this.inFlightReqReceived(key, val))
+    )
+
+
+  }
+
+  private inFlightReqReceived<T>(key: string, val: T): void {
+    if (!this.inflightRequests.has(key)) return;
+
+    const inflight = this.inflightRequests.get(key);
+    const observers = inflight.observers.length;
+
+    if (observers) {
+
+      console.log(`Notifying ${observers} subscribers for ${key}`, 'color: blue');
+
+      inflight.next(val);
+    }
+
+    inflight.complete();
+
+    this.inflightRequests.delete(key);
+  }
 
 }

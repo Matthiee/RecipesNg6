@@ -3,7 +3,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Recipe } from '../recipe.model';
 import { RecipeService } from '../recipe.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { first } from 'rxjs/operators';
+import { first, map, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -20,10 +20,12 @@ export class RecipeDetailComponent implements OnInit {
   ngOnInit() {
 
     this.route.params
-      .subscribe((params: Params) => {
-        this.id = +params['id'];
-        this.recipeSvc.getRecipe(this.id).subscribe(recipe => this.recipe = recipe);
-      });
+      .pipe(
+        map(params => +params['id']),
+        tap(id => this.id = id),
+        switchMap(id => this.recipeSvc.getRecipe(id))
+      )
+      .subscribe((data: Recipe) => this.recipe = data);
 
   }
 

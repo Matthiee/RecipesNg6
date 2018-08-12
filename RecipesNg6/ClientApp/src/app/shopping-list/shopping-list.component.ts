@@ -8,12 +8,9 @@ import { Subscription, Observable } from 'rxjs';
   templateUrl: './shopping-list.component.html',
   styleUrls: ['./shopping-list.component.css']
 })
-export class ShoppingListComponent implements OnInit, OnDestroy {
+export class ShoppingListComponent implements OnInit {
 
   ingredients: Observable<Ingredient[]>;
-
-  private subscription: Subscription;
-
   constructor(private shoppingListSvc: ShoppingListService) { }
 
   ngOnInit() {
@@ -25,10 +22,6 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     //    this.ingredients = ingredients;
     //  });
 
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 
   onEditItem(i: Ingredient) {
