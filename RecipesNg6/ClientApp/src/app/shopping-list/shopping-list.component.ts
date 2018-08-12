@@ -25,7 +25,7 @@ export class ShoppingListComponent implements OnInit {
   }
 
   onEditItem(i: Ingredient) {
-    this.shoppingListSvc.editingStateChanged.next(i.id);
+    this.shoppingListSvc.editingStateChanged.next(i);
   }
 
 }

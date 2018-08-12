@@ -1,68 +1,109 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Ingredient } from '../shared/ingredient.model';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { DataStorageService } from '../shared/data-storage.service';
-import { flatMap, filter } from 'rxjs/operators';
+import { flatMap, filter, first } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShoppingListService {
 
-  public ingredientListChanged = new Subject<Ingredient[]>();
-  public editingStateChanged = new Subject<number>();
+  private _ingredients: BehaviorSubject<Ingredient[]> = new BehaviorSubject([]);
 
-  constructor(private db: DataStorageService) { }
+  //public ingredientListChanged = new Subject<Ingredient[]>();
+  public editingStateChanged = new Subject<Ingredient>();
+
+  constructor(private db: DataStorageService) {
+    this.init();
+  }
+
+  private init(): void {
+    this.db.getIngredients().pipe(first()).subscribe(
+      ingredients => {
+
+        console.info(`Loaded ${ingredients.length} ingredients`);
+
+        this._ingredients.next(ingredients);
+
+      },
+      error => this._ingredients.error(error));
+  }
 
   public getIngredients(): Observable<Ingredient[]> {
-    return this.db.getIngredients();
+    return this._ingredients.asObservable();
   }
 
   public getIngredient(id: number): Observable<Ingredient> {
-    return this.db.getIngredients().pipe(flatMap(_ => _), filter(_ => _.id === id));
+    return this._ingredients.pipe(flatMap(_ => _), filter(_ => _.id === id));
   }
 
-  public async addIngredient(ingredient: Ingredient) {
-
-    await this.addNewOrExistingIngredient(ingredient);
-
-    this.ingredientListChanged.next();
+  public addIngredient(ingredient: Ingredient) {
+    
+    this.addNewOrExistingIngredient(ingredient);
   }
 
-  private async addNewOrExistingIngredient(ingredient: Ingredient) {
-    let existingIngredient: Ingredient = await this.getIngredients()
-      .pipe(
-        flatMap(_ => _),
-        filter(_ => _.name === ingredient.name))
-      .toPromise();
+  private addNewOrExistingIngredient(ingredient: Ingredient) {
 
-    if (!!existingIngredient)
-      existingIngredient.amount = +existingIngredient.amount + +ingredient.amount;
-    else {
-      let result = await this.db.addIngredient(ingredient).toPromise();
+    let ingredients = this._ingredients.value;
+    const idx = ingredients.findIndex(i => i.name === ingredient.name);
 
-      (await this.getIngredients().toPromise()).push(result);
+    if (idx > -1) {
+      
+      this.db.addIngredient(ingredient)
+        .pipe(
+          first())
+        .subscribe(
+          result => {
+            
+            console.info(`Added ${ingredient.name} in the DB!`);
+            
+            ingredients.push(result);
+
+            this._ingredients.next(ingredients);
+          },
+          err => this._ingredients.error(err));
+
+    } else {
+
+      const id = ingredients[idx].id;
+
+      this.updateIngredient(id, ingredient);
+
     }
       
   }
 
-  public async updateIngredient(id: number, newIngredient: Ingredient) {
+  public updateIngredient(id: number, ingredient: Ingredient) {
 
-    await this.db.updateIngredient(id, newIngredient);
+    let ingredients = this._ingredients.value;
+    ingredient.id = id;
+
+    const idx = ingredients.findIndex(i => i.id === id);
+
+    this.db.updateIngredient(id, ingredient)
+      .pipe(
+        first())
+      .subscribe(
+      result => {
+
+          console.info(`Updated #${id} ${ingredient.name} in the DB!`);
+
+          ingredients[idx] = ingredient;
+
+          this._ingredients.next(ingredients);
+        },
+        err => this._ingredients.error(err));
 
   }
 
-  public async addIngredients(ingredients: Ingredient[]) {
+  public addIngredients(ingredients: Ingredient[]) {
 
-    ingredients.forEach(async (i: Ingredient) => await this.addNewOrExistingIngredient(i));
-
-    this.ingredientListChanged.next();
+    ingredients.forEach((i: Ingredient) => this.addNewOrExistingIngredient(i));
   }
 
-  public async removeIngredient(ingredient: Ingredient) {
+  public removeIngredient(ingredient: Ingredient) {
 
-    await this.db.removeIngredient(ingredient).toPromise();
-
-    this.ingredientListChanged.next();
+    this.db.removeIngredient(ingredient);
   }
 }

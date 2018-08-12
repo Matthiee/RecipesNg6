@@ -24,13 +24,12 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.editingStateChangedSubscription = this.shoppingListSvc.editingStateChanged
-      .subscribe(async id => {
+      .subscribe(item => {
 
         this.editMode = true;
 
-        this.editedItemId = id;
-
-        this.editedIngredient = await this.shoppingListSvc.getIngredient(id).toPromise();
+        this.editedIngredient = item;
+        this.editedItemId = item.id;
 
         this.frmShoppingList.setValue({
           name: this.editedIngredient.name,

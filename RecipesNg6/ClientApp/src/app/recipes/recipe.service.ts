@@ -14,10 +14,10 @@ export class RecipeService {
   private _recipes: BehaviorSubject<Recipe[]> = new BehaviorSubject([]);
 
   constructor(private shoppingListSvc: ShoppingListService, private db: DataStorageService) {
-    this.loadInitialRecipes();
+    this.init();
   }
 
-  private loadInitialRecipes(): void {
+  private init(): void {
     this.db.getRecipes().pipe(first()).subscribe(
       recipes => {
 

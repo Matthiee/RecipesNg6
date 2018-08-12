@@ -21,6 +21,9 @@ export class RecipeEditComponent implements OnInit {
   constructor(private route: ActivatedRoute, private recipeSvc: RecipeService, private router: Router) { }
 
   ngOnInit() {
+
+    this.initForm();
+
     this.route.params
       .pipe(
         map(params => +params['id']),
