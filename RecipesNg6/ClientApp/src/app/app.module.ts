@@ -17,6 +17,8 @@ import { RecipeStartComponent } from './recipes/recipe-start/recipe-start.compon
 import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { NotifierModule } from 'angular-notifier';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -36,7 +38,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FormsModule,
     ReactiveFormsModule,
     NgbModule.forRoot(),
-    AppRoutingModule
+    AppRoutingModule,
+    NotifierModule.withConfig({
+      position: {
+        horizontal: { position: "right" },
+        vertical: { position: "top" }
+      }
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

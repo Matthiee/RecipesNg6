@@ -5,6 +5,7 @@ import { ShoppingListService } from '../shopping-list/shopping-list.service';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { DataStorageService } from '../shared/data-storage.service';
 import { flatMap, filter, switchMap, first } from 'rxjs/operators';
+import { NotifierService } from 'angular-notifier';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class RecipeService {
 
   private _recipes: BehaviorSubject<Recipe[]> = new BehaviorSubject([]);
 
-  constructor(private shoppingListSvc: ShoppingListService, private db: DataStorageService) {
+  constructor(private shoppingListSvc: ShoppingListService, private db: DataStorageService, private toast: NotifierService) {
     this.init();
   }
 
@@ -26,7 +27,15 @@ export class RecipeService {
         this._recipes.next(recipes);
 
       },
-      error => this._recipes.error(error));
+      error => {
+        this.showError("Unable to get the recipes");
+        this._recipes.error(error);
+      });
+  }
+
+  private showError(msg: string): void {
+    console.log("showError");
+    this.toast.notify('error', msg);
   }
 
   public getRecipes(id?: number): Observable<Recipe[]> {
@@ -60,7 +69,10 @@ export class RecipeService {
 
           this._recipes.next(recipes);
         },
-        err => this._recipes.error(err));
+        error => {
+          this.showError("Unable to update the recipe");
+          this._recipes.error(error);
+        });
   }
 
   public addRecipe(recipe: Recipe): void {
@@ -106,7 +118,10 @@ export class RecipeService {
             this._recipes.next(recipes);
 
         },
-      err => this._recipes.error(err));
+        error => {
+          this.showError("Unable to delete the recipe");
+          this._recipes.error(error);
+        });
 
   }
 }
