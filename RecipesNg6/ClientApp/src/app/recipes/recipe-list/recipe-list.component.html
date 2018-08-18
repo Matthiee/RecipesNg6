@@ -6,7 +6,13 @@
 </div>
 <div class="row">
   <div class="col-md-12">
-    <app-recipe-item *ngFor="let recipe of recipes" [recipe]="recipe"></app-recipe-item>
+    <div class="list-group">
+      <app-recipe-item class="list-group-item list-group-item-action"
+                       *ngFor="let recipe of recipes"
+                       [recipe]="recipe"
+                       routerLink="{{ recipe.id }}"
+                       routerLinkActive="active"></app-recipe-item>
+    </div>
   </div>
 </div>
 

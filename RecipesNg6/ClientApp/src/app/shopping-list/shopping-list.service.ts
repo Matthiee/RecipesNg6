@@ -3,6 +3,7 @@ import { Ingredient } from '../shared/ingredient.model';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { DataStorageService } from '../shared/data-storage.service';
 import { flatMap, filter, first } from 'rxjs/operators';
+import { NotifierService } from 'angular-notifier';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class ShoppingListService {
   //public ingredientListChanged = new Subject<Ingredient[]>();
   public editingStateChanged = new Subject<Ingredient>();
 
-  constructor(private db: DataStorageService) {
+  constructor(private db: DataStorageService, private toast: NotifierService) {
     this.init();
   }
 
@@ -22,12 +23,20 @@ export class ShoppingListService {
     this.db.getIngredients().pipe(first()).subscribe(
       ingredients => {
 
-        console.info(`Loaded ${ingredients.length} ingredients`);
-
         this._ingredients.next(ingredients);
 
+        this.toast.notify('info', `Loaded ${ingredients.length} ingredients!`);
+
       },
-      error => this._ingredients.error(error));
+      error => this.showError(error, 'Unable to load the ingredients'));
+  }
+
+  private showError(error: any, msg: string) {
+
+    this.toast.notify('error', msg);
+
+    this._ingredients.error(error);
+
   }
 
   public getIngredients(): Observable<Ingredient[]> {
@@ -39,7 +48,7 @@ export class ShoppingListService {
   }
 
   public addIngredient(ingredient: Ingredient) {
-    
+
     this.addNewOrExistingIngredient(ingredient);
   }
 
@@ -49,20 +58,20 @@ export class ShoppingListService {
     const idx = ingredients.findIndex(i => i.name === ingredient.name);
 
     if (idx > -1) {
-      
+
       this.db.addIngredient(ingredient)
         .pipe(
           first())
         .subscribe(
           result => {
-            
-            console.info(`Added ${ingredient.name} in the DB!`);
-            
+
             ingredients.push(result);
 
             this._ingredients.next(ingredients);
+
+            this.toast.notify('success', `Added '${ingredient.name}'!`);
           },
-          err => this._ingredients.error(err));
+          err => this.showError(err, 'Unable to add ingredient'));
 
     } else {
 
@@ -71,7 +80,7 @@ export class ShoppingListService {
       this.updateIngredient(id, ingredient);
 
     }
-      
+
   }
 
   public updateIngredient(id: number, ingredient: Ingredient) {
@@ -85,15 +94,14 @@ export class ShoppingListService {
       .pipe(
         first())
       .subscribe(
-      result => {
-
-          console.info(`Updated #${id} ${ingredient.name} in the DB!`);
-
+        result => {
           ingredients[idx] = ingredient;
 
           this._ingredients.next(ingredients);
+
+          this.toast.notify('success', `Updated '${ingredient.name}'!`);
         },
-        err => this._ingredients.error(err));
+        err => this.showError(err, 'Unable to update ingredient'));
 
   }
 
@@ -102,8 +110,24 @@ export class ShoppingListService {
     ingredients.forEach((i: Ingredient) => this.addNewOrExistingIngredient(i));
   }
 
-  public removeIngredient(ingredient: Ingredient) {
+  public removeIngredient(id: number) {
 
-    this.db.removeIngredient(ingredient);
+    this.db.removeIngredient(id)
+      .pipe(
+        first())
+      .subscribe(
+        result => {
+          let ingredients = this._ingredients.value;
+
+          const idx = ingredients.findIndex(r => r.id === id);
+
+          const removedIngredients = ingredients.splice(idx, 1);
+
+          if (!!removedIngredients && removedIngredients.length > 0)
+            this._ingredients.next(ingredients);
+
+          this.toast.notify('success', "Ingredient removed!");
+        },
+        err => this.showError(err, 'Unabel to remove ingredient'));
   }
 }

@@ -1,4 +1,5 @@
-<div *ngIf="recipe"> <!-- TODO show loader ?? -->
+<div *ngIf="recipe">
+  <!-- TODO show loader ?? -->
   <div class="row">
     <div class="col-md-12">
       <img [src]="recipe.imagePath" alt="{{ recipe.name }}" class="img-fluid rounded" style="height: 200px" />
@@ -36,8 +37,8 @@
   </div>
   <div class="row" *ngIf="recipe">
     <div class="col-md-12">
-      <ul class="list-group" *ngFor="let ingredient of recipe.ingredients">
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let ingredient of recipe.ingredients">
           Name: {{ ingredient.name }}
           <span class="badge badge-primary badge-pill">{{ ingredient.amount }}</span>
         </li>

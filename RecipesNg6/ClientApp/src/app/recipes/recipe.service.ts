@@ -22,10 +22,9 @@ export class RecipeService {
     this.db.getRecipes().pipe(first()).subscribe(
       recipes => {
 
-        console.info(`Loaded ${recipes.length} recipes`, 'color: green');
-
         this._recipes.next(recipes);
 
+        this.toast.notify('info', `Loaded ${recipes.length} recipes`);
       },
       error => {
         this.showError("Unable to get the recipes");
@@ -34,11 +33,10 @@ export class RecipeService {
   }
 
   private showError(msg: string): void {
-    console.log("showError");
     this.toast.notify('error', msg);
   }
 
-  public getRecipes(id?: number): Observable<Recipe[]> {
+  public getRecipes(): Observable<Recipe[]> {
     return this._recipes.asObservable();
   }
 
@@ -68,6 +66,8 @@ export class RecipeService {
           recipes[idx] = recipe;
 
           this._recipes.next(recipes);
+
+          this.toast.notify('success', `Updated '${recipe.name}'!`);
         },
         error => {
           this.showError("Unable to update the recipe");
@@ -82,14 +82,13 @@ export class RecipeService {
         first())
       .subscribe(
         result => {
-
-          console.info(`Added ${recipe.name} in the DB!`, 'color: green');
-
           let recipes = this._recipes.value;
 
           recipes.push(result);
 
           this._recipes.next(recipes);
+
+          this.toast.notify('success', `Added '${recipe.name}'!`);
         },
         err => this._recipes.error(err));
   }
@@ -105,9 +104,6 @@ export class RecipeService {
         first())
       .subscribe(
         result => {
-
-          console.info(`Removed recipes #${id} from the DB!`, 'color: green');
-
           let recipes = this._recipes.value;
 
           const idx = recipes.findIndex(r => r.id === id);
@@ -116,6 +112,8 @@ export class RecipeService {
 
           if (!!removedRecipes && removedRecipes.length > 0)
             this._recipes.next(recipes);
+
+          this.toast.notify('success', "Recipe removed!");
 
         },
         error => {

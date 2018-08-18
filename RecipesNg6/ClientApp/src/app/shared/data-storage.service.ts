@@ -62,8 +62,8 @@ export class DataStorageService {
     return this.http.put(environment.apiUrl + INGREDIENT_EP + '/' + id, ingredient);
   }
 
-  removeIngredient(ingredient: Ingredient) {
-    return this.http.delete(environment.apiUrl + INGREDIENT_EP + '/' + ingredient.id);
+  removeIngredient(id: number) {
+    return this.http.delete(environment.apiUrl + INGREDIENT_EP + '/' + id);
   }
 
 
