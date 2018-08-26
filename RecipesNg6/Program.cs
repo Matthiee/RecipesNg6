@@ -23,19 +23,23 @@ namespace RecipesNg6
             {
                 var svcs = scope.ServiceProvider;
 
-                var loggerFactory = svcs.GetRequiredService<ILoggerFactory>();
+                var logger = svcs.GetRequiredService<ILoggerFactory>().CreateLogger<Program>();
 
-                using (var recipeDb = svcs.GetRequiredService<RecipeDbContext>())
-                {
-                    recipeDb.Database.Migrate();
-
-                    var logger = loggerFactory.CreateLogger<Program>();
-
-                    logger.LogInformation("Migration completed");
-                }
+                Migrate<RecipeDbContext>(svcs, logger);
+                Migrate<UserDbContext>(svcs, logger);
             }
 
             host.Run();
+        }
+
+        private static void Migrate<T>(IServiceProvider svc, ILogger logger) where T : DbContext
+        {
+            using (var db = svc.GetRequiredService<T>())
+            {
+                db.Database.Migrate();
+
+                logger.LogInformation($"Migration for {typeof(T).Name} completed");
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

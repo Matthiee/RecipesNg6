@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,9 @@ using RecipesNg6.Database;
 
 namespace RecipesNg6.Controllers
 {
+    [AllowAnonymous]
     [Route("api/v1/[controller]")]
+    [ApiController]
     public class IngredientController : Controller
     {
         private readonly RecipeDbContext db;
@@ -61,6 +64,7 @@ namespace RecipesNg6.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRecipe([FromRoute] int id, [FromBody] CreateUpdateIngredientDto receivedIngredient, CancellationToken cancellation)
         {
@@ -89,6 +93,7 @@ namespace RecipesNg6.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddIngredient([FromBody] CreateUpdateIngredientDto receivedIngredient, CancellationToken cancellation)
         {

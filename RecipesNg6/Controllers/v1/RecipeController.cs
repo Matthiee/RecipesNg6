@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,7 +16,9 @@ using RecipesNg6.Database;
 
 namespace RecipesNg6.Controllers
 {
+    [Authorize]
     [Route("api/v1/[controller]")]
+    //[ApiController]
     public class RecipeController : Controller
     {
         private readonly RecipeDbContext db;
@@ -28,6 +32,7 @@ namespace RecipesNg6.Controllers
             this.logger = logger;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public IEnumerable<RecipeDto> GetAll()
         {
@@ -37,6 +42,7 @@ namespace RecipesNg6.Controllers
                 .ProjectTo<RecipeDto>(mapper.ConfigurationProvider);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDto>> GetById(int id, CancellationToken cancellation)
         {
