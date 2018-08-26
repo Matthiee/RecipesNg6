@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Recipe } from './recipe.model';
 import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
-import { Subject, Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { DataStorageService } from '../shared/data-storage.service';
-import { flatMap, filter, switchMap, first } from 'rxjs/operators';
+import { filter, switchMap, first } from 'rxjs/operators';
 import { NotifierService } from 'angular-notifier';
 
 @Injectable({
@@ -55,7 +55,7 @@ export class RecipeService {
       .pipe(
         first())
       .subscribe(
-        done => {
+        _done => {
 
           console.info(`Updated #${recipe.id} ${recipe.name} in the DB!`, 'color: green');
 
@@ -103,7 +103,7 @@ export class RecipeService {
       .pipe(
         first())
       .subscribe(
-        result => {
+        _result => {
           let recipes = this._recipes.value;
 
           const idx = recipes.findIndex(r => r.id === id);

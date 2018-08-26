@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { RecipeService } from '../recipes/recipe.service';
 import { Recipe } from '../recipes/recipe.model';
-import { Observable, ReplaySubject, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Ingredient } from './ingredient.model';
 import { tap, first } from 'rxjs/operators';
@@ -91,7 +90,7 @@ export class DataStorageService {
 
     if (observers) {
 
-      console.log(`Notifying ${observers} subscribers for ${key}`, 'color: blue');
+      console.log(`Notifying ${observers} subscribers for ${key}`);
 
       inflight.next(val);
     }

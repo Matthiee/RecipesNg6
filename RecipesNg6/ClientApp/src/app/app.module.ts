@@ -4,6 +4,8 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+import { JwtModule } from '@auth0/angular-jwt';
+
 import { AppComponent } from './app.component';
 import { RecipesComponent } from './recipes/recipes.component';
 import { HeaderComponent } from './header/header.component';
@@ -18,6 +20,12 @@ import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NotifierModule } from 'angular-notifier';
+import { SignupComponent } from './auth/signup/signup.component';
+import { SigninComponent } from './auth/signin/signin.component';
+
+export function tokenGetter() {
+  return localStorage.getItem('token');
+}
 
 @NgModule({
   declarations: [
@@ -31,6 +39,8 @@ import { NotifierModule } from 'angular-notifier';
     ShoppingEditComponent,
     RecipeStartComponent,
     RecipeEditComponent,
+    SignupComponent,
+    SigninComponent,
   ],
   imports: [
     BrowserModule,
@@ -43,6 +53,13 @@ import { NotifierModule } from 'angular-notifier';
       position: {
         horizontal: { position: "right" },
         vertical: { position: "top" }
+      }
+    }),
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: tokenGetter,
+        whitelistedDomains: ['localhost:4200','localhost:5000'],
+        blacklistedRoutes:['localhost:5000/api/v1/Account']
       }
     })
   ],
