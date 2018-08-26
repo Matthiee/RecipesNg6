@@ -18,7 +18,7 @@ namespace RecipesNg6.Controllers
 {
     [Authorize]
     [Route("api/v1/[controller]")]
-    //[ApiController]
+    [ApiController]
     public class RecipeController : Controller
     {
         private readonly RecipeDbContext db;
@@ -32,7 +32,7 @@ namespace RecipesNg6.Controllers
             this.logger = logger;
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpGet]
         public IEnumerable<RecipeDto> GetAll()
         {
@@ -42,7 +42,7 @@ namespace RecipesNg6.Controllers
                 .ProjectTo<RecipeDto>(mapper.ConfigurationProvider);
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDto>> GetById(int id, CancellationToken cancellation)
         {

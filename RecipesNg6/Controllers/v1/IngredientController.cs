@@ -17,7 +17,7 @@ using RecipesNg6.Database;
 
 namespace RecipesNg6.Controllers
 {
-    [AllowAnonymous]
+    [Authorize]
     [Route("api/v1/[controller]")]
     [ApiController]
     public class IngredientController : Controller
@@ -64,7 +64,6 @@ namespace RecipesNg6.Controllers
             }
         }
 
-        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRecipe([FromRoute] int id, [FromBody] CreateUpdateIngredientDto receivedIngredient, CancellationToken cancellation)
         {
@@ -93,7 +92,6 @@ namespace RecipesNg6.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddIngredient([FromBody] CreateUpdateIngredientDto receivedIngredient, CancellationToken cancellation)
         {
