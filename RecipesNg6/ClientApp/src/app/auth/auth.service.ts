@@ -24,7 +24,9 @@ export class AuthService {
   constructor(private http: HttpClient, private toast: NotifierService) { }
 
   public isLoggedIn() {
+    
     const token = localStorage.getItem('token');
+    console.log(token);
     return !!token && !this.jwt.isTokenExpired(token);
   }
 
@@ -38,15 +40,13 @@ export class AuthService {
 
   private handleLoginResult(obs: Observable<ILoginResult>): Observable<ILoginResult> {
 
-    obs.pipe(
+    return obs.pipe(
       tap(x => 
         localStorage.setItem('token', x.token)),
       catchError(err => {
         this.toast.notify('error', err);
         throw err;
       }));
-
-    return obs;
   }
 
 
