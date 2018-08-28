@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -39,6 +40,7 @@ namespace RecipesNg6
                 options.UseSqlServer(Configuration["Databases:Recipes:ConnectionString"],
                     sqlOptions => sqlOptions.EnableRetryOnFailure().MigrationsAssembly("RecipesNg6.Database"));
                 options.EnableSensitiveDataLogging(Configuration.GetValue<bool>("Databases:Recipes:SensitiveDataLogging"));
+                options.ConfigureWarnings(x => x.Throw(RelationalEventId.QueryClientEvaluationWarning));
             });
 
             services.AddDbContext<UserDbContext>(options =>
@@ -46,6 +48,7 @@ namespace RecipesNg6
                 options.UseSqlServer(Configuration["Databases:Users:ConnectionString"],
                     sqlOptions => sqlOptions.EnableRetryOnFailure().MigrationsAssembly("RecipesNg6.Database"));
                 options.EnableSensitiveDataLogging(Configuration.GetValue<bool>("Databases:Users:SensitiveDataLogging"));
+                options.ConfigureWarnings(x => x.Throw(RelationalEventId.QueryClientEvaluationWarning));
             });
 
 
